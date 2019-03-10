@@ -20,7 +20,7 @@ class Stock {
     return Stock(
         companySymbol: json['companySymbol'],
         stockClose: json['stockClose'],
-        stockDate: DateTime.parse(json['stockDate']),
+        stockDate: DateTime.now(),
         stockHigh: json['stockHigh'],
         stockLow: json['stockLow'],
         stockOpen: json['stockOpen'],

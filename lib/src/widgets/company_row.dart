@@ -7,43 +7,34 @@ class CompanyRow extends StatelessWidget {
   CompanyRow(this.company);
   @override
   Widget build(BuildContext context) {
-    return new GestureDetector(
+    return GestureDetector(
       onTap: () {
-        var route = new MaterialPageRoute(
-            builder: (BuildContext context) =>
-                new StockScreen(company: company));
+        var route = MaterialPageRoute(
+            builder: (BuildContext context) => StockScreen(company: company));
         Navigator.of(context).push(route);
       },
-      child: new Card(
+      child: Card(
         elevation: 4.0,
-        margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-        child: new GestureDetector(
-          onTap: () {
-            var route = MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    StockScreen(company: company));
-            Navigator.of(context).push(route);
-          },
-          child: new Container(
-            padding: EdgeInsets.all(8.0),
-            child: new Row(
-              children: <Widget>[
-                new CircleAvatar(
-                  child: new Text('A'),
-                ),
-                new Padding(
-                  padding: EdgeInsets.only(right: 10),
-                ),
-                new Text(
-                  company.companyName,
-                  style: TextStyle(fontSize: 20.0),
-                ),
-                new Text(
-                  company.companySymbol,
-                  style: TextStyle(fontSize: 10.0),
-                )
-              ],
-            ),
+        margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+        child: Container(
+          padding: EdgeInsets.all(8.0),
+          child: Row(
+            children: <Widget>[
+              CircleAvatar(
+                child: Text(company.companySymbol.substring(0, 1)),
+              ),
+              Padding(
+                padding: EdgeInsets.only(right: 10),
+              ),
+              Text(
+                company.companyName,
+                style: TextStyle(fontSize: 20.0),
+              ),
+              Text(
+                company.companySymbol,
+                style: TextStyle(fontSize: 10.0),
+              ),
+            ],
           ),
         ),
       ),

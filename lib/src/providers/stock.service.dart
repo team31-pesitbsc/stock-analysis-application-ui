@@ -11,7 +11,7 @@ Future<List<Stock>> getStocks(
   final response = await http.get(url);
   if (response.statusCode == 200) {
     final jsonResponse = json.decode(response.body);
-    return new List<Stock>.from(jsonResponse.map((x) => Stock.fromJson(x)));
+    return List<Stock>.from(jsonResponse.map((x) => Stock.fromJson(x)));
   } else {
     throw Exception('Failed to load company');
   }

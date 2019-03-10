@@ -1,43 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:stock_analysis_application_ui/src/widgets/company_row.dart';
-import 'package:stock_analysis_application_ui/src/providers/company.service.dart';
+import 'package:stock_analysis_application_ui/src/screens/company_screen.dart';
 
-void main() => runApp(new MaterialApp(
-      home: new AppHome(),
+void main() => runApp(MaterialApp(
+      home: CompanyScreen(),
     ));
-
-class AppHome extends StatefulWidget {
-  @override
-  State<AppHome> createState() {
-    return new AppState();
-  }
-}
-
-class AppState extends State<AppHome> {
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: AppBar(
-        title: new Text("List of companies"),
-      ),
-      body: new Container(
-          child: FutureBuilder(
-        future: getCompanies(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return Container(
-              child: Center(
-                child: Text("loading"),
-              ),
-            );
-          } else {
-            return ListView.builder(
-              itemBuilder: (_, int index) => CompanyRow(snapshot.data[index]),
-              itemCount: snapshot.data.length,
-            );
-          }
-        },
-      )),
-    );
-  }
-}
