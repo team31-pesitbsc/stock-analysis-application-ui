@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stock_analysis_application_ui/src/widgets/company_row.dart';
-import 'package:stock_analysis_application_ui/src/models/company.dart';
 import 'package:stock_analysis_application_ui/src/providers/company.service.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'dart:convert';
 
 void main() => runApp(new MaterialApp(
       home: new AppHome(),
