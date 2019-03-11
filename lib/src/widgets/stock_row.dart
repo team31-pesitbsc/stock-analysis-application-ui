@@ -21,7 +21,7 @@ class StockRow extends StatelessWidget {
             ),
             Text(
               stock.stockDate.toString(),
-              style: TextStyle(fontSize: 20.0),
+              style: TextStyle(fontSize: 10.0),
             ),
             Text(
               stock.companySymbol,

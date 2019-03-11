@@ -1,7 +1,9 @@
+// TODO - figure out why date time parse is not working and convert stockDate to DateTime type
+
 class Stock {
   final String companySymbol;
   final double stockClose;
-  final DateTime stockDate;
+  final String stockDate;
   final double stockHigh;
   final double stockLow;
   final double stockOpen;
@@ -20,7 +22,7 @@ class Stock {
     return Stock(
         companySymbol: json['companySymbol'],
         stockClose: json['stockClose'],
-        stockDate: DateTime.now(),
+        stockDate: json['stockDate'],
         stockHigh: json['stockHigh'],
         stockLow: json['stockLow'],
         stockOpen: json['stockOpen'],

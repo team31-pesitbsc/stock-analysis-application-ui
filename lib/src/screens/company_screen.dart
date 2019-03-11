@@ -28,7 +28,8 @@ class CompanyScreenState extends State<CompanyScreen> {
             );
           } else {
             return ListView.builder(
-              itemBuilder: (_, int index) => CompanyRow(snapshot.data[index]),
+              itemBuilder: (BuildContext context, int index) =>
+                  CompanyRow(snapshot.data[index]),
               itemCount: snapshot.data.length,
             );
           }
