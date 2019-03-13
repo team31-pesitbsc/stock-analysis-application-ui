@@ -7,7 +7,7 @@ class Company {
   factory Company.fromJson(Map<String, dynamic> json) {
     return Company(
       companySymbol: json['companySymbol'],
-      companyName: json['companySymbol'],
+      companyName: json['companyName'],
     );
   }
 }

@@ -1,6 +1,7 @@
 class Prediction {
   final String companySymbol;
   final int tradingWindow;
+  final String classifier;
   final int predictionLabel1;
   final double predictionAccuracy1;
   final int predictionLabel3;
@@ -11,6 +12,7 @@ class Prediction {
   Prediction({
     this.companySymbol,
     this.tradingWindow,
+    this.classifier,
     this.predictionLabel1,
     this.predictionAccuracy1,
     this.predictionLabel3,
@@ -23,6 +25,7 @@ class Prediction {
     return Prediction(
       companySymbol: json['companySymbol'],
       tradingWindow: json['tradingWindow'],
+      classifier: json['classifier'],
       predictionLabel1: json['predictionLabel1'],
       predictionAccuracy1: json['predictionAccuracy1'],
       predictionLabel3: json['predictionLabel3'],

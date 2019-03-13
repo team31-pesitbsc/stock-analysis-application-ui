@@ -1,5 +1,5 @@
 import "package:stock_analysis_application_ui/src/models/prediction.dart";
-import "package:stock_analysis_application_ui/src/constants/app_constants.dart";
+import "package:stock_analysis_application_ui/src/common/constants/app_constants.dart";
 
 import 'package:http/http.dart' as http;
 import 'dart:async';
