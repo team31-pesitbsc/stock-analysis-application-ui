@@ -24,7 +24,7 @@ class CompanyRow extends StatelessWidget {
               Column(
                 children: <Widget>[
                   CircleAvatar(
-                    child: Text(company.companySymbol.substring(0, 1)),
+                    child: Text(company.symbol.substring(0, 1)),
                   ),
                 ],
               ),
@@ -34,11 +34,13 @@ class CompanyRow extends StatelessWidget {
               Column(
                 children: <Widget>[
                   Text(
-                    company.companyName,
+                    (company.name.length <= 15)
+                        ? company.name
+                        : company.name.substring(0, 15) + "...",
                     style: TextStyle(fontSize: 20.0),
                   ),
                   Text(
-                    company.companySymbol,
+                    company.symbol,
                     style: TextStyle(fontSize: 10.0),
                   ),
                 ],

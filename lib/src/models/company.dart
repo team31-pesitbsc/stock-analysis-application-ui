@@ -1,13 +1,13 @@
 class Company {
-  final String companySymbol;
-  final String companyName;
+  final String symbol;
+  final String name;
 
-  Company({this.companySymbol, this.companyName});
+  Company({this.symbol, this.name});
 
   factory Company.fromJson(Map<String, dynamic> json) {
     return Company(
-      companySymbol: json['companySymbol'],
-      companyName: json['companyName'],
+      symbol: json['symbol'],
+      name: json['name'],
     );
   }
 }

@@ -13,24 +13,14 @@ class StockRow extends StatelessWidget {
         padding: EdgeInsets.all(8.0),
         child: Row(
           children: <Widget>[
-            CircleAvatar(
-              child: Text('A'),
-            ),
+            Icon(Icons.arrow_drop_down_circle),
             Padding(
               padding: EdgeInsets.only(right: 10),
             ),
             Text(
-              stock.stockDate.toString(),
+              stock.date.toString(),
               style: TextStyle(fontSize: 10.0),
             ),
-            Text(
-              stock.companySymbol,
-              style: TextStyle(fontSize: 10.0),
-            ),
-            Text(
-              stock.stockOpen.toString(),
-              style: TextStyle(fontSize: 10.0),
-            )
           ],
         ),
       ),

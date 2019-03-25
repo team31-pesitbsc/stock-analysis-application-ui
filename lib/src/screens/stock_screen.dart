@@ -21,39 +21,42 @@ class _StockScreenState extends State<StockScreen> {
       appBar: AppBar(
         title: Text("Stock Page"),
       ),
-      body:
-          Container(child: ListView.builder(itemBuilder: (context, pageNumber) {
-        return KeepAliveFutureBuilder(
-          future: getStocks(
-              companySymbol: widget.company.companySymbol,
-              pageSize: AppConstants.pageSize,
-              pageNumber: pageNumber),
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-              case ConnectionState.waiting:
-                return SizedBox(
-                    height: MediaQuery.of(context).size.height * 2,
-                    child: Align(
-                        alignment: Alignment.topCenter,
-                        child: CircularProgressIndicator()));
-              case ConnectionState.active:
-                break;
-              case ConnectionState.done:
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return this._buildPage(snapshot.data);
-                }
-            }
-          },
-        );
-      })),
+      body: Container(
+          child: ListView.builder(
+              reverse: true,
+              itemBuilder: (context, pageNumber) {
+                return KeepAliveFutureBuilder(
+                  future: getStocks(
+                      symbol: widget.company.symbol,
+                      pageSize: AppConstants.pageSize,
+                      pageNumber: pageNumber),
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                        return SizedBox(
+                            height: MediaQuery.of(context).size.height * 2,
+                            child: Align(
+                                alignment: Alignment.topCenter,
+                                child: CircularProgressIndicator()));
+                      case ConnectionState.active:
+                        break;
+                      case ConnectionState.done:
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          return this._buildPage(snapshot.data);
+                        }
+                    }
+                  },
+                );
+              })),
     );
   }
 
   Widget _buildPage(List<Stock> page) {
     return ListView(
+        reverse: true,
         shrinkWrap: true,
         primary: false,
         children: page.map((Stock stock) {
