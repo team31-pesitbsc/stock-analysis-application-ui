@@ -3,6 +3,8 @@ import 'package:stock_analysis_application_ui/src/models/company.dart';
 import 'package:stock_analysis_application_ui/src/models/stock.dart';
 
 import 'package:stock_analysis_application_ui/src/widgets/stock_row.dart';
+import 'package:stock_analysis_application_ui/src/widgets/keep_alive_future_builder.dart';
+
 import 'package:stock_analysis_application_ui/src/providers/stock.service.dart';
 import 'package:stock_analysis_application_ui/src/providers/prediction.service.dart';
 
@@ -73,28 +75,4 @@ class _StockScreenState extends State<StockScreen> {
           return StockRow(stock);
         }).toList());
   }
-}
-
-class KeepAliveFutureBuilder extends StatefulWidget {
-  final Future future;
-  final AsyncWidgetBuilder builder;
-
-  KeepAliveFutureBuilder({this.future, this.builder});
-
-  @override
-  _KeepAliveFutureBuilderState createState() => _KeepAliveFutureBuilderState();
-}
-
-class _KeepAliveFutureBuilderState extends State<KeepAliveFutureBuilder>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: widget.future,
-      builder: widget.builder,
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
 }
