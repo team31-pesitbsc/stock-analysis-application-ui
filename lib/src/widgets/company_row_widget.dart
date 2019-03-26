@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:stock_analysis_application_ui/src/models/company.dart';
 import 'package:stock_analysis_application_ui/src/screens/stock_screen.dart';
 
-class CompanyRow extends StatelessWidget {
+class CompanyRowWidget extends StatelessWidget {
   final Company company;
   final int index;
-  CompanyRow({this.company, this.index});
+  CompanyRowWidget({this.company, this.index});
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

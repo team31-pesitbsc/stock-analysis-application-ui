@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stock_analysis_application_ui/src/widgets/company_row.dart';
+import 'package:stock_analysis_application_ui/src/widgets/company_row_widget.dart';
 import 'package:stock_analysis_application_ui/src/providers/company.service.dart';
 import 'package:stock_analysis_application_ui/src/models/company.dart';
 
@@ -56,7 +56,8 @@ class CompanyScreenState extends State<CompanyScreen> {
             ),
             Flexible(
               child: ListView.builder(
-                itemBuilder: (BuildContext context, int index) => CompanyRow(
+                itemBuilder: (BuildContext context, int index) =>
+                    CompanyRowWidget(
                       company: filteredCompanies[index],
                       index: index,
                     ),

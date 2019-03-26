@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:stock_analysis_application_ui/src/models/stock.dart';
 
-class StockRow extends StatelessWidget {
+class StockRowWidget extends StatelessWidget {
   final Stock stock;
-  StockRow(this.stock);
+  StockRowWidget(this.stock);
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -13,7 +13,7 @@ class StockRow extends StatelessWidget {
         padding: EdgeInsets.all(8.0),
         child: Row(
           children: <Widget>[
-            Icon(Icons.arrow_drop_down_circle),
+            Icon(Icons.calendar_today),
             Padding(
               padding: EdgeInsets.only(right: 10),
             ),

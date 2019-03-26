@@ -6,8 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 // TODO - get predictions json with keys as int
-Future<Map<String, Map<int, Map<int, Prediction>>>> getPredictions(
-    String symbol) async {
+Future<List<Prediction>> getPredictions(String symbol) async {
   // TODO - find better way to handle query params
   Map<String, String> queryParams = {
     'symbol': symbol,
@@ -18,20 +17,8 @@ Future<Map<String, Map<int, Map<int, Prediction>>>> getPredictions(
   final response = await http.get(url);
   if (response.statusCode == 200) {
     final jsonResponse = json.decode(response.body);
-    Map<String, Map<int, Map<int, Prediction>>> predictions = {};
-    AppConstants.CLASSIFIERS.forEach((classifier) => {
-          predictions[classifier] = {},
-          AppConstants.TRADING_WINDOWS.forEach((tradingWindow) => {
-                predictions[classifier][tradingWindow] = {},
-                AppConstants.FORWARD_DAYS.forEach((forwardDay) => {
-                      predictions[classifier][tradingWindow][forwardDay] =
-                          Prediction.fromJson(jsonResponse['predictions']
-                                  [classifier][tradingWindow.toString()]
-                              [forwardDay.toString()])
-                    })
-              })
-        });
-    return predictions;
+    return List<Prediction>.from(
+        jsonResponse['predictions'].map((x) => Prediction.fromJson(x)));
   } else {
     throw Exception('Failed to load company');
   }
