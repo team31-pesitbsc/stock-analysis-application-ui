@@ -5,15 +5,33 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
-Future<List<Prediction>> getPredictions(
-    String companySymbol, int limit, int offset) async {
+// TODO - get predictions json with keys as int
+Future<Map<String, Map<int, Map<int, Prediction>>>> getPredictions(
+    String symbol) async {
   // TODO - find better way to handle query params
-  String url = AppConstants.baseUrl + '/predictions/$companySymbol';
+  Map<String, String> queryParams = {
+    'symbol': symbol,
+  };
+  String queryString = queryParams.length > 0 ? "?" : "";
+  queryParams.forEach((k, v) => queryString += k + "=" + v + "&");
+  String url = AppConstants.baseUrl + '/predictions' + queryString;
   final response = await http.get(url);
   if (response.statusCode == 200) {
     final jsonResponse = json.decode(response.body);
-    return List<Prediction>.from(
-        jsonResponse.map((x) => Prediction.fromJson(x)));
+    Map<String, Map<int, Map<int, Prediction>>> predictions = {};
+    AppConstants.CLASSIFIERS.forEach((classifier) => {
+          predictions[classifier] = {},
+          AppConstants.TRADING_WINDOWS.forEach((tradingWindow) => {
+                predictions[classifier][tradingWindow] = {},
+                AppConstants.FORWARD_DAYS.forEach((forwardDay) => {
+                      predictions[classifier][tradingWindow][forwardDay] =
+                          Prediction.fromJson(jsonResponse['predictions']
+                                  [classifier][tradingWindow.toString()]
+                              [forwardDay.toString()])
+                    })
+              })
+        });
+    return predictions;
   } else {
     throw Exception('Failed to load company');
   }

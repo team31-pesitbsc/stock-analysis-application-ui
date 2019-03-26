@@ -4,6 +4,8 @@ import 'package:stock_analysis_application_ui/src/models/stock.dart';
 
 import 'package:stock_analysis_application_ui/src/widgets/stock_row.dart';
 import 'package:stock_analysis_application_ui/src/providers/stock.service.dart';
+import 'package:stock_analysis_application_ui/src/providers/prediction.service.dart';
+
 import 'package:stock_analysis_application_ui/src/common/constants/app_constants.dart';
 
 class StockScreen extends StatefulWidget {
@@ -16,12 +18,20 @@ class StockScreen extends StatefulWidget {
 
 class _StockScreenState extends State<StockScreen> {
   @override
+  void initState() {
+    super.initState();
+    getPredictions(widget.company.symbol).then((something) => {print("done")});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Stock Page"),
       ),
       body: Container(
+          margin: EdgeInsets.symmetric(vertical: 20.0),
+          height: MediaQuery.of(context).size.height * 0.65,
           child: ListView.builder(
               reverse: true,
               itemBuilder: (context, pageNumber) {

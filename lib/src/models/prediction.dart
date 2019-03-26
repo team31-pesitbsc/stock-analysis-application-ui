@@ -1,37 +1,13 @@
 class Prediction {
-  final String companySymbol;
-  final int tradingWindow;
-  final String classifier;
-  final int predictionLabel1;
-  final double predictionAccuracy1;
-  final int predictionLabel3;
-  final double predictionAccuracy3;
-  final int predictionLabel5;
-  final double predictionAccuracy5;
+  final int label;
+  final double accuracy;
 
-  Prediction({
-    this.companySymbol,
-    this.tradingWindow,
-    this.classifier,
-    this.predictionLabel1,
-    this.predictionAccuracy1,
-    this.predictionLabel3,
-    this.predictionAccuracy3,
-    this.predictionLabel5,
-    this.predictionAccuracy5,
-  });
+  Prediction({this.label, this.accuracy});
 
   factory Prediction.fromJson(Map<String, dynamic> json) {
     return Prediction(
-      companySymbol: json['companySymbol'],
-      tradingWindow: json['tradingWindow'],
-      classifier: json['classifier'],
-      predictionLabel1: json['predictionLabel1'],
-      predictionAccuracy1: json['predictionAccuracy1'],
-      predictionLabel3: json['predictionLabel3'],
-      predictionAccuracy3: json['predictionAccuracy3'],
-      predictionLabel5: json['predictionLabel5'],
-      predictionAccuracy5: json['predictionAccuracy5'],
+      label: json['label'],
+      accuracy: json['accuracy'],
     );
   }
 }
