@@ -12,6 +12,26 @@ class CompanyScreen extends StatefulWidget {
 
 class CompanyScreenState extends State<CompanyScreen> {
   List<Company> companies = [];
+  List<Company> filteredCompanies = [];
+  final searchTextController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    getCompanies().then((fetchedCompanies) {
+      setState(() {
+        companies = fetchedCompanies;
+        filteredCompanies = companies;
+        searchTextController.addListener(searchTextListener);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    searchTextController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,33 +51,33 @@ class CompanyScreenState extends State<CompanyScreen> {
                   hintStyle: TextStyle(color: Colors.grey[400]),
                 ),
                 textAlign: TextAlign.left,
-                controller: TextEditingController(),
+                controller: searchTextController,
               ),
             ),
             Flexible(
-              child: FutureBuilder(
-                future: getCompanies(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Company>> snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.done:
-                      return ListView.builder(
-                        itemBuilder: (BuildContext context, int index) =>
-                            CompanyRowWidget(
-                              company: snapshot.data[index],
-                              index: index,
-                            ),
-                        itemCount: snapshot.data.length,
-                      );
-                    default:
-                      return Text("Loading...");
-                  }
-                },
+              child: ListView.builder(
+                itemBuilder: (BuildContext context, int index) =>
+                    CompanyRowWidget(
+                      company: filteredCompanies[index],
+                      index: index,
+                    ),
+                itemCount: filteredCompanies.length,
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  searchTextListener() {
+    setState(() {
+      var searchText = searchTextController.text.toLowerCase();
+      filteredCompanies = companies
+          .where((company) =>
+              company.name.toLowerCase().contains(searchText) ||
+              company.symbol.toLowerCase().contains(searchText))
+          .toList();
+    });
   }
 }
