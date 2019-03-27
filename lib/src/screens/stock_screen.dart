@@ -22,12 +22,8 @@ class StockScreen extends StatefulWidget {
 
 class _StockScreenState extends State<StockScreen> {
   List<Prediction> predictions;
-  @override
-  void initState() {
-    super.initState();
-    // getPredictions(widget.company.symbol)
-    //     .then((predictions) => {this.predictions = predictions});
-  }
+  String classifier = AppConstants.CLASSIFIERS[0];
+  int tradingWindow = AppConstants.TRADING_WINDOWS[0];
 
   @override
   Widget build(BuildContext context) {
@@ -69,16 +65,39 @@ class _StockScreenState extends State<StockScreen> {
                       },
                     );
                   })),
-          DropdownButton<String>(
-            value: "One",
-            onChanged: (String newValue) {},
-            items: <String>['One', 'Two', 'Free', 'Four']
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
+          Row(
+            children: <Widget>[
+              DropdownButton<String>(
+                hint: Text("CLASSIFIER"),
+                onChanged: (String newValue) {
+                  setState(() {
+                    classifier = newValue;
+                  });
+                },
+                items: AppConstants.CLASSIFIERS
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              DropdownButton<int>(
+                hint: Text("TRADING_WINDOWS"),
+                onChanged: (int newValue) {
+                  setState(() {
+                    tradingWindow = newValue;
+                  });
+                },
+                items: AppConstants.TRADING_WINDOWS
+                    .map<DropdownMenuItem<int>>((int value) {
+                  return DropdownMenuItem<int>(
+                    value: value,
+                    child: Text(value.toString()),
+                  );
+                }).toList(),
+              ),
+            ],
           ),
           Container(
               margin: EdgeInsets.symmetric(vertical: 10.0),
@@ -98,9 +117,18 @@ class _StockScreenState extends State<StockScreen> {
                         return Text('Error: ${snapshot.error}');
                       return ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: snapshot.data.length,
+                        itemCount: snapshot.data
+                            .where((x) =>
+                                x.classifier == classifier &&
+                                x.tradingWindow == tradingWindow)
+                            .toList()
+                            .length,
                         itemBuilder: (BuildContext context, int index) {
-                          return PredictionWidget(snapshot.data[index]);
+                          return PredictionWidget(snapshot.data
+                              .where((x) =>
+                                  x.classifier == classifier &&
+                                  x.tradingWindow == tradingWindow)
+                              .toList()[index]);
                         },
                       );
                   }
