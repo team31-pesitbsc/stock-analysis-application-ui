@@ -113,7 +113,7 @@ class _StockScreenState extends State<StockScreen> {
           ),
           Container(
               margin: EdgeInsets.symmetric(vertical: 10.0),
-              height: MediaQuery.of(context).size.height * 0.2,
+              height: MediaQuery.of(context).size.height * 0.15,
               child: FutureBuilder(
                 future: getPredictions(widget.company.symbol),
                 builder: (BuildContext context,

@@ -1,4 +1,3 @@
-// TODO - figure out why date time parse is not working and convert stockDate to DateTime type
 import 'package:intl/intl.dart';
 
 class Stock {
