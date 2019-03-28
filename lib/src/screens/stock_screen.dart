@@ -33,9 +33,21 @@ class _StockScreenState extends State<StockScreen> {
       ),
       body: Column(
         children: <Widget>[
+          Column(
+            children: <Widget>[
+              Text(
+                widget.company.name,
+                style: TextStyle(fontSize: 25.0),
+              ),
+              Text(
+                widget.company.symbol,
+                style: TextStyle(fontSize: 15.0),
+              )
+            ],
+          ),
           Container(
               margin: EdgeInsets.symmetric(vertical: 5.0),
-              height: MediaQuery.of(context).size.height * 0.6,
+              height: MediaQuery.of(context).size.height * 0.53,
               child: ListView.builder(
                   reverse: true,
                   itemBuilder: (context, pageNumber) {
