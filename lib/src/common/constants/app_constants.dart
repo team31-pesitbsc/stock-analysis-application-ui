@@ -1,5 +1,6 @@
 class AppConstants {
-  static const String baseUrl = "http://192.168.2.6:5000";
+  static const String baseUrl =
+      "https://stock-analysis-application.herokuapp.com/";
   static const pageSize = 30;
   static const TRADING_WINDOWS = [3, 5, 15, 30, 60, 90];
   static const FORWARD_DAYS = [1, 3, 5];
