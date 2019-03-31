@@ -29,7 +29,7 @@ class PredictionDialogWidget extends StatelessWidget {
               style: TextStyle(fontSize: 25.0),
             ),
             Text(
-              "Accuracy : ${prediction.accuracy}",
+              "probability : ${prediction.probability}",
               style: TextStyle(fontSize: 25.0),
             ),
           ],

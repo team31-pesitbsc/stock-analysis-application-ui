@@ -22,7 +22,7 @@ class PredictionWidget extends StatelessWidget {
                 animation: true,
                 radius: 100,
                 lineWidth: 10,
-                percent: prediction.accuracy,
+                percent: prediction.probability,
                 header: Text(
                     "${prediction.classifier} : ${prediction.tradingWindow.toString()} \n Prediction ${prediction.forwardDay.toString()} day ahead"),
                 center: Icon(prediction.label == 1

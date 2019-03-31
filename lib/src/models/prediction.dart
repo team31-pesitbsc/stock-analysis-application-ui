@@ -1,13 +1,13 @@
 class Prediction {
   final int label;
-  final double accuracy;
+  final double probability;
   final String classifier;
   final int tradingWindow;
   final int forwardDay;
 
   Prediction(
       {this.label,
-      this.accuracy,
+      this.probability,
       this.classifier,
       this.tradingWindow,
       this.forwardDay});
@@ -15,7 +15,7 @@ class Prediction {
   factory Prediction.fromJson(Map<String, dynamic> json) {
     return Prediction(
         label: json['label'],
-        accuracy: json['accuracy'],
+        probability: json['probability'],
         classifier: json['classifier'],
         tradingWindow: json['tradingWindow'],
         forwardDay: json['forwardDay']);
