@@ -21,7 +21,7 @@ class PredictionDialogWidget extends StatelessWidget {
               style: TextStyle(fontSize: 25.0),
             ),
             Text(
-              "Prediction ${prediction.forwardDay} for days from today : ",
+              "Prediction ${prediction.forwardDay} days from today : ",
               style: TextStyle(fontSize: 25.0),
             ),
             Text(

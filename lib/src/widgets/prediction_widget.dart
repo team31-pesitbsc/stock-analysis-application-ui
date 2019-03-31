@@ -13,18 +13,23 @@ class PredictionWidget extends StatelessWidget {
     return GestureDetector(
       child: Card(
         elevation: 4.0,
-        margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+        margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 1.0),
         child: Container(
-          padding: EdgeInsets.all(8.0),
           child: Row(
             children: <Widget>[
               CircularPercentIndicator(
                 animation: true,
-                radius: 100,
-                lineWidth: 10,
+                radius: 60,
+                lineWidth: 5,
                 percent: prediction.probability,
-                header: Text(
-                    "${prediction.classifier} : ${prediction.tradingWindow.toString()} \n Prediction ${prediction.forwardDay.toString()} day ahead"),
+                header: Column(
+                  children: <Widget>[
+                    Text("Classifier : ${prediction.classifier}"),
+                    Text(
+                        "Trading Window : ${prediction.tradingWindow.toString()}"),
+                    Text("${prediction.forwardDay.toString()} day ahead"),
+                  ],
+                ),
                 center: Icon(prediction.label == 1
                     ? Icons.keyboard_arrow_up
                     : Icons.keyboard_arrow_down),
