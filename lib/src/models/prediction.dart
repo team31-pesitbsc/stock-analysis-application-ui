@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 class Prediction {
   final int label;
   final double probability;
@@ -6,18 +8,16 @@ class Prediction {
   final int forwardDay;
 
   Prediction(
-      {this.label,
-      this.probability,
-      this.classifier,
-      this.tradingWindow,
-      this.forwardDay});
+      {@required this.label,
+      @required this.probability,
+      @required this.classifier,
+      @required this.tradingWindow,
+      @required this.forwardDay});
 
-  factory Prediction.fromJson(Map<String, dynamic> json) {
-    return Prediction(
-        label: json['label'],
-        probability: json['probability'],
-        classifier: json['classifier'],
-        tradingWindow: json['tradingWindow'],
-        forwardDay: json['forwardDay']);
-  }
+  Prediction.fromJson(Map<String, dynamic> json)
+      : label = json['label'],
+        probability = json['probability'],
+        classifier = json['classifier'],
+        tradingWindow = json['tradingWindow'],
+        forwardDay = json['forwardDay'];
 }

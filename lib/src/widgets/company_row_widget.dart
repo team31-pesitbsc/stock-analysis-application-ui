@@ -37,7 +37,7 @@ class CompanyRowWidget extends StatelessWidget {
                   Text(
                     (company.name.length <= 15)
                         ? company.name
-                        : company.name.substring(0, 15) + "...",
+                        : company.name.substring(0, 20) + "...",
                     style: TextStyle(fontSize: 20.0),
                   ),
                   Text(

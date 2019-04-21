@@ -1,13 +1,14 @@
+import 'package:meta/meta.dart';
+
 class Company {
   final String symbol;
   final String name;
+  final int bseCode;
 
-  Company({this.symbol, this.name});
+  Company({@required this.symbol, @required this.name, @required this.bseCode});
 
-  factory Company.fromJson(Map<String, dynamic> json) {
-    return Company(
-      symbol: json['symbol'],
-      name: json['name'],
-    );
-  }
+  Company.fromJson(Map<String, dynamic> json)
+      : symbol = json['symbol'],
+        name = json['name'],
+        bseCode = json['bse_code'];
 }

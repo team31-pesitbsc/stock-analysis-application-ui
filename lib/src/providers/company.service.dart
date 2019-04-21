@@ -6,8 +6,10 @@ import 'dart:convert';
 
 Future<List<Company>> getCompanies() async {
   final response = await http.get(AppConstants.baseUrl + '/companies');
+  print(response);
   if (response.statusCode == 200) {
     final jsonResponse = json.decode(response.body);
+    print(jsonResponse);
     return List<Company>.from(jsonResponse.map((x) => Company.fromJson(x)));
   } else {
     throw Exception('Failed to load company');

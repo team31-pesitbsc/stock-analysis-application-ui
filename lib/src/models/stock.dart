@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:meta/meta.dart';
 
 class Stock {
   final double close;
@@ -8,11 +9,16 @@ class Stock {
   final double open;
   final int volume;
 
-  Stock({this.close, this.date, this.high, this.low, this.open, this.volume});
+  Stock(
+      {@required this.close,
+      @required this.date,
+      @required this.high,
+      @required this.low,
+      @required this.open,
+      @required this.volume});
 
   factory Stock.fromJson(Map<String, dynamic> json) {
     DateFormat dateFormat = DateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZ");
-
     return Stock(
         close: json['close'],
         date: dateFormat.parse(json['date']),

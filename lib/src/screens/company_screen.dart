@@ -1,83 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 import 'package:stock_analysis_application_ui/src/widgets/company_row_widget.dart';
-import 'package:stock_analysis_application_ui/src/providers/company.service.dart';
 import 'package:stock_analysis_application_ui/src/models/company.dart';
 
 class CompanyScreen extends StatefulWidget {
+  final List<Company> companies;
+  CompanyScreen({Key key, @required this.companies}) : super(key: key);
   @override
-  State<CompanyScreen> createState() {
-    return CompanyScreenState();
-  }
+  CompanyScreenState createState() => CompanyScreenState();
 }
 
 class CompanyScreenState extends State<CompanyScreen> {
-  List<Company> companies = [];
-  List<Company> filteredCompanies = [];
-  final searchTextController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    getCompanies().then((fetchedCompanies) {
-      setState(() {
-        companies = fetchedCompanies;
-        filteredCompanies = companies;
-        searchTextController.addListener(searchTextListener);
-      });
-    });
+    searchController.addListener(() => {setState(() {})});
   }
 
   @override
   void dispose() {
-    searchTextController.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Stock Analysis App"),
-      ),
-      body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(border: Border.all(width: 1.0)),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Search",
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                ),
-                textAlign: TextAlign.left,
-                controller: searchTextController,
+        appBar: AppBar(
+          title: Text("STOCK ANALYSIS APPLICATION"),
+        ),
+        body: Container(
+          child: Column(
+            children: <Widget>[
+              CompanySearchField(
+                searchController: searchController,
               ),
-            ),
-            Flexible(
-              child: ListView.builder(
-                itemBuilder: (BuildContext context, int index) =>
-                    CompanyRowWidget(
-                      company: filteredCompanies[index],
-                      index: index,
-                    ),
-                itemCount: filteredCompanies.length,
+              CompanyListView(
+                companies: widget.companies
+                    .where((company) =>
+                        company.name
+                            .toLowerCase()
+                            .contains(searchController.text) ||
+                        company.symbol
+                            .toLowerCase()
+                            .contains(searchController.text))
+                    .toList(),
               ),
-            ),
-          ],
+            ],
+          ),
+        ));
+  }
+}
+
+class CompanySearchField extends StatelessWidget {
+  final TextEditingController searchController;
+  const CompanySearchField({Key key, this.searchController}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextField(
+          controller: searchController,
+          decoration: InputDecoration(
+              labelText: "search for company",
+              hintText: "search for company name (or) bse code",
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)))),
         ),
       ),
     );
   }
+}
 
-  searchTextListener() {
-    setState(() {
-      var searchText = searchTextController.text.toLowerCase();
-      filteredCompanies = companies
-          .where((company) =>
-              company.name.toLowerCase().contains(searchText) ||
-              company.symbol.toLowerCase().contains(searchText))
-          .toList();
-    });
+class CompanyListView extends StatelessWidget {
+  final List<Company> companies;
+  const CompanyListView({Key key, this.companies}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Flexible(
+        child: ListView.builder(
+          itemCount: companies.length,
+          itemBuilder: (BuildContext context, int index) => CompanyRowWidget(
+                company: companies[index],
+                index: index,
+              ),
+        ),
+      ),
+    );
   }
 }
