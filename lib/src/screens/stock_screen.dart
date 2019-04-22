@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stock_analysis_application_ui/src/models/company.dart';
+
 import 'package:stock_analysis_application_ui/src/models/stock.dart';
 import 'package:stock_analysis_application_ui/src/models/prediction.dart';
 
@@ -14,150 +15,204 @@ import 'package:stock_analysis_application_ui/src/common/constants/app_constants
 
 class StockScreen extends StatefulWidget {
   final Company company;
-
   StockScreen({Key key, this.company}) : super(key: key);
-  @override
-  _StockScreenState createState() => _StockScreenState();
+
+  StockScreenState createState() => StockScreenState();
 }
 
-class _StockScreenState extends State<StockScreen> {
-  List<Prediction> predictions;
-  String classifier = AppConstants.CLASSIFIERS[0];
-  int tradingWindow = AppConstants.TRADING_WINDOWS[0];
+class StockScreenState extends State<StockScreen> {
+  int tradingWindowIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Stock Page"),
+      appBar: StockScreenAppBar(
+        company: widget.company,
       ),
       body: Column(
         children: <Widget>[
-          Column(
-            children: <Widget>[
-              Text(
-                widget.company.name,
-                style: TextStyle(fontSize: 25.0),
-              ),
-              Text(
-                widget.company.symbol,
-                style: TextStyle(fontSize: 15.0),
-              )
-            ],
+          Padding(
+            padding: EdgeInsets.all(50),
           ),
-          Container(
-              margin: EdgeInsets.symmetric(vertical: 5.0),
-              height: MediaQuery.of(context).size.height * 0.53,
-              child: ListView.builder(
-                  reverse: true,
-                  itemBuilder: (context, pageNumber) {
-                    return KeepAliveFutureBuilder(
-                      future: getStocks(
-                          symbol: widget.company.symbol,
-                          pageSize: AppConstants.pageSize,
-                          pageNumber: pageNumber),
-                      builder: (context, snapshot) {
-                        switch (snapshot.connectionState) {
-                          case ConnectionState.none:
-                          case ConnectionState.waiting:
-                            return SizedBox(
-                                height: MediaQuery.of(context).size.height * 2,
-                                child: Align(
-                                    alignment: Alignment.topCenter,
-                                    child: CircularProgressIndicator()));
-                          case ConnectionState.active:
-                            break;
-                          case ConnectionState.done:
-                            if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            } else {
-                              return this._buildPage(snapshot.data);
-                            }
-                        }
-                      },
-                    );
-                  })),
-          Row(
-            children: <Widget>[
-              DropdownButton<String>(
-                hint: Text("CLASSIFIER"),
-                onChanged: (String newValue) {
+          Slider(
+            label:
+                AppConstants.TRADING_WINDOWS[tradingWindowIndex - 1].toString(),
+            value: tradingWindowIndex.toDouble(),
+            onChanged: (value) => {
                   setState(() {
-                    classifier = newValue;
-                  });
+                    tradingWindowIndex = value.toInt();
+                  })
                 },
-                items: AppConstants.CLASSIFIERS
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              DropdownButton<int>(
-                hint: Text("TRADING_WINDOWS"),
-                onChanged: (int newValue) {
-                  setState(() {
-                    tradingWindow = newValue;
-                  });
-                },
-                items: AppConstants.TRADING_WINDOWS
-                    .map<DropdownMenuItem<int>>((int value) {
-                  return DropdownMenuItem<int>(
-                    value: value,
-                    child: Text(value.toString()),
-                  );
-                }).toList(),
-              ),
-            ],
+            min: 1,
+            max: AppConstants.TRADING_WINDOWS.length.toDouble(),
+            divisions: AppConstants.TRADING_WINDOWS.length - 1,
           ),
-          Container(
-              margin: EdgeInsets.symmetric(vertical: 10.0),
-              height: MediaQuery.of(context).size.height * 0.15,
-              child: FutureBuilder(
-                future: getPredictions(widget.company.symbol),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Prediction>> snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                      return Text('Press button to start.');
-                    case ConnectionState.active:
-                    case ConnectionState.waiting:
-                      return Text('Awaiting result...');
-                    case ConnectionState.done:
-                      if (snapshot.hasError)
-                        return Text('Error: ${snapshot.error}');
-                      return ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: snapshot.data
-                            .where((x) =>
-                                x.classifier == classifier &&
-                                x.tradingWindow == tradingWindow)
-                            .toList()
-                            .length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return PredictionWidget(snapshot.data
-                              .where((x) =>
-                                  x.classifier == classifier &&
-                                  x.tradingWindow == tradingWindow)
-                              .toList()[index]);
-                        },
-                      );
-                  }
-                },
-              )),
         ],
       ),
     );
   }
+}
 
-  Widget _buildPage(List<Stock> page) {
-    return ListView(
-        reverse: true,
-        shrinkWrap: true,
-        primary: false,
-        children: page.map((Stock stock) {
-          return StockRowWidget(stock);
-        }).toList());
+class StockScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final Company company;
+  @override
+  final Size preferredSize = const Size.fromHeight(56.0);
+  const StockScreenAppBar({Key key, this.company}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: Text("hello world"),
+    );
   }
 }
+
+// class StockScreen extends StatefulWidget {
+//   final Company company;
+
+//   StockScreen({Key key, this.company}) : super(key: key);
+//   @override
+//   _StockScreenState createState() => _StockScreenState();
+// }
+
+// class _StockScreenState extends State<StockScreen> {
+//   List<Prediction> predictions;
+//   String classifier = AppConstants.CLASSIFIERS[0];
+//   int tradingWindow = AppConstants.TRADING_WINDOWS[0];
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text("Stock Page"),
+//       ),
+//       body: Column(
+//         children: <Widget>[
+//           Column(
+//             children: <Widget>[
+//               Text(
+//                 widget.company.name,
+//                 style: TextStyle(fontSize: 25.0),
+//               ),
+//               Text(
+//                 widget.company.symbol,
+//                 style: TextStyle(fontSize: 15.0),
+//               )
+//             ],
+//           ),
+//           Container(
+//               margin: EdgeInsets.symmetric(vertical: 5.0),
+//               height: MediaQuery.of(context).size.height * 0.53,
+//               child: ListView.builder(
+//                   reverse: true,
+//                   itemBuilder: (context, pageNumber) {
+//                     return KeepAliveFutureBuilder(
+//                       future: getStocks(
+//                           symbol: widget.company.symbol,
+//                           pageSize: AppConstants.pageSize,
+//                           pageNumber: pageNumber),
+//                       builder: (context, snapshot) {
+//                         switch (snapshot.connectionState) {
+//                           case ConnectionState.none:
+//                           case ConnectionState.waiting:
+//                             return SizedBox(
+//                                 height: MediaQuery.of(context).size.height * 2,
+//                                 child: Align(
+//                                     alignment: Alignment.topCenter,
+//                                     child: CircularProgressIndicator()));
+//                           case ConnectionState.active:
+//                             break;
+//                           case ConnectionState.done:
+//                             if (snapshot.hasError) {
+//                               return Text('Error: ${snapshot.error}');
+//                             } else {
+//                               return this._buildPage(snapshot.data);
+//                             }
+//                         }
+//                       },
+//                     );
+//                   })),
+//           Row(
+//             children: <Widget>[
+//               DropdownButton<String>(
+//                 hint: Text("CLASSIFIER"),
+//                 onChanged: (String newValue) {
+//                   setState(() {
+//                     classifier = newValue;
+//                   });
+//                 },
+//                 items: AppConstants.CLASSIFIERS
+//                     .map<DropdownMenuItem<String>>((String value) {
+//                   return DropdownMenuItem<String>(
+//                     value: value,
+//                     child: Text(value),
+//                   );
+//                 }).toList(),
+//               ),
+//               DropdownButton<int>(
+//                 hint: Text("TRADING_WINDOWS"),
+//                 onChanged: (int newValue) {
+//                   setState(() {
+//                     tradingWindow = newValue;
+//                   });
+//                 },
+//                 items: AppConstants.TRADING_WINDOWS
+//                     .map<DropdownMenuItem<int>>((int value) {
+//                   return DropdownMenuItem<int>(
+//                     value: value,
+//                     child: Text(value.toString()),
+//                   );
+//                 }).toList(),
+//               ),
+//             ],
+//           ),
+//           Container(
+//               margin: EdgeInsets.symmetric(vertical: 10.0),
+//               height: MediaQuery.of(context).size.height * 0.15,
+//               child: FutureBuilder(
+//                 future: getPredictions(widget.company.symbol),
+//                 builder: (BuildContext context,
+//                     AsyncSnapshot<List<Prediction>> snapshot) {
+//                   switch (snapshot.connectionState) {
+//                     case ConnectionState.none:
+//                       return Text('Press button to start.');
+//                     case ConnectionState.active:
+//                     case ConnectionState.waiting:
+//                       return Text('Awaiting result...');
+//                     case ConnectionState.done:
+//                       if (snapshot.hasError)
+//                         return Text('Error: ${snapshot.error}');
+//                       return ListView.builder(
+//                         scrollDirection: Axis.horizontal,
+//                         itemCount: snapshot.data
+//                             .where((x) =>
+//                                 x.classifier == classifier &&
+//                                 x.tradingWindow == tradingWindow)
+//                             .toList()
+//                             .length,
+//                         itemBuilder: (BuildContext context, int index) {
+//                           return PredictionWidget(snapshot.data
+//                               .where((x) =>
+//                                   x.classifier == classifier &&
+//                                   x.tradingWindow == tradingWindow)
+//                               .toList()[index]);
+//                         },
+//                       );
+//                   }
+//                 },
+//               )),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildPage(List<Stock> page) {
+//     return ListView(
+//         reverse: true,
+//         shrinkWrap: true,
+//         primary: false,
+//         children: page.map((Stock stock) {
+//           return StockRowWidget(stock);
+//         }).toList());
+//   }
+// }
