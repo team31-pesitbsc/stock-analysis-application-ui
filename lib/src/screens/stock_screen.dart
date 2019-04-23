@@ -6,47 +6,36 @@ import 'package:stock_analysis_application_ui/src/models/prediction.dart';
 
 import 'package:stock_analysis_application_ui/src/widgets/stock_row_widget.dart';
 import 'package:stock_analysis_application_ui/src/widgets/keep_alive_future_builder.dart';
-import 'package:stock_analysis_application_ui/src/widgets/prediction_widget.dart';
+import 'package:stock_analysis_application_ui/src/widgets/prediction_row_widget.dart';
 
 import 'package:stock_analysis_application_ui/src/providers/stock.service.dart';
 import 'package:stock_analysis_application_ui/src/providers/prediction.service.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'package:stock_analysis_application_ui/src/common/constants/app_constants.dart';
 
-class StockScreen extends StatefulWidget {
+class StockScreen extends StatelessWidget {
   final Company company;
-  StockScreen({Key key, this.company}) : super(key: key);
-
-  StockScreenState createState() => StockScreenState();
-}
-
-class StockScreenState extends State<StockScreen> {
-  int tradingWindowIndex = 1;
+  const StockScreen({Key key, this.company}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: StockScreenAppBar(
-        company: widget.company,
+        company: company,
       ),
       body: Column(
         children: <Widget>[
           Padding(
             padding: EdgeInsets.all(50),
           ),
-          Slider(
-            label:
-                AppConstants.TRADING_WINDOWS[tradingWindowIndex - 1].toString(),
-            value: tradingWindowIndex.toDouble(),
-            onChanged: (value) => {
-                  setState(() {
-                    tradingWindowIndex = value.toInt();
-                  })
-                },
-            min: 1,
-            max: AppConstants.TRADING_WINDOWS.length.toDouble(),
-            divisions: AppConstants.TRADING_WINDOWS.length - 1,
+          StockScreenPredictions(
+            company: company,
           ),
+          Padding(
+            padding: EdgeInsets.all(30),
+          ),
+          TradingWindowPicker(),
         ],
       ),
     );
@@ -62,7 +51,98 @@ class StockScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text("hello world"),
+      title: Text(company.name),
+    );
+  }
+}
+
+class StockScreenPredictions extends StatelessWidget {
+  final Company company;
+  const StockScreenPredictions({Key key, this.company}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: getPredictions(company.symbol),
+      initialData: List<Prediction>(),
+      builder: (BuildContext context,
+          AsyncSnapshot<List<Prediction>> predictionsSnapshot) {
+        return StreamBuilder(
+          stream: tradingWindowIndexService.stream$,
+          initialData: 0,
+          builder:
+              (BuildContext context, AsyncSnapshot tradingWindowIndexSnapshot) {
+            return StockScreenPredictionsList(
+                predictions: predictionsSnapshot.data
+                    .where((x) =>
+                        x.classifier == "RF" &&
+                        x.tradingWindow ==
+                            AppConstants.TRADING_WINDOWS[
+                                tradingWindowIndexSnapshot.data])
+                    .toList());
+          },
+        );
+      },
+    );
+  }
+}
+
+class StockScreenPredictionsList extends StatelessWidget {
+  final List<Prediction> predictions;
+  const StockScreenPredictionsList({Key key, this.predictions})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        PredictionRowWidget(predictions[0]),
+        Padding(
+          padding: EdgeInsets.all(5),
+        ),
+        PredictionRowWidget(predictions[1]),
+        Padding(
+          padding: EdgeInsets.all(5),
+        ),
+        PredictionRowWidget(predictions[2])
+      ],
+    );
+  }
+}
+
+class TradingWindowIndex {
+  BehaviorSubject _tradingWindowIndex = BehaviorSubject.seeded(0);
+  Observable get stream$ => _tradingWindowIndex.stream;
+  int get current => _tradingWindowIndex.value;
+  setTradingWindowIndex(int newTradingWindowIndex) {
+    _tradingWindowIndex.add(newTradingWindowIndex);
+  }
+}
+
+TradingWindowIndex tradingWindowIndexService = TradingWindowIndex();
+
+class TradingWindowPicker extends StatefulWidget {
+  TradingWindowPicker({Key key}) : super(key: key);
+
+  TradingWindowPickerState createState() => TradingWindowPickerState();
+}
+
+class TradingWindowPickerState extends State<TradingWindowPicker> {
+  int tradingWindowIndex = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Slider(
+      label: AppConstants.TRADING_WINDOWS[tradingWindowIndex].toString(),
+      value: tradingWindowIndex.toDouble(),
+      onChanged: (value) {
+        setState(() {
+          tradingWindowIndex = value.toInt();
+          tradingWindowIndexService.setTradingWindowIndex(tradingWindowIndex);
+        });
+      },
+      min: 0,
+      max: AppConstants.TRADING_WINDOWS.length.toDouble() - 1,
+      divisions: AppConstants.TRADING_WINDOWS.length - 1,
     );
   }
 }
@@ -182,22 +262,7 @@ class StockScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
 //                     case ConnectionState.done:
 //                       if (snapshot.hasError)
 //                         return Text('Error: ${snapshot.error}');
-//                       return ListView.builder(
-//                         scrollDirection: Axis.horizontal,
-//                         itemCount: snapshot.data
-//                             .where((x) =>
-//                                 x.classifier == classifier &&
-//                                 x.tradingWindow == tradingWindow)
-//                             .toList()
-//                             .length,
-//                         itemBuilder: (BuildContext context, int index) {
-//                           return PredictionWidget(snapshot.data
-//                               .where((x) =>
-//                                   x.classifier == classifier &&
-//                                   x.tradingWindow == tradingWindow)
-//                               .toList()[index]);
-//                         },
-//                       );
+//
 //                   }
 //                 },
 //               )),

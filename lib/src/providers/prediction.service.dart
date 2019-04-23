@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
-// TODO - get predictions json with keys as int
 Future<List<Prediction>> getPredictions(String symbol) async {
   // TODO - find better way to handle query params
   Map<String, String> queryParams = {
