@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stock_analysis_application_ui/src/screens/company_screen.dart';
+import 'package:stock_analysis_application_ui/src/screens/company/company_screen.dart';
 import 'package:stock_analysis_application_ui/src/providers/company.service.dart';
 import "package:stock_analysis_application_ui/src/models/company.dart";
 

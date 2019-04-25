@@ -26,8 +26,10 @@ class StockScreen extends StatelessWidget {
       body: Column(
         children: <Widget>[
           FutureBuilder(
-            future:
-                getStocks(symbol: company.symbol, pageSize: 30, pageNumber: 0),
+            future: getStocks(
+                symbol: company.symbol,
+                pageSize: AppConstants.pageSize,
+                pageNumber: 0),
             initialData: List<Stock>(),
             builder:
                 (BuildContext context, AsyncSnapshot<List<Stock>> snapshot) {
@@ -79,10 +81,18 @@ class SimpleTimeSeriesChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new charts.TimeSeriesChart(
-      _createChartData(stocks),
-      animate: animate,
-      dateTimeFactory: const charts.LocalDateTimeFactory(),
+    return new StreamBuilder(
+      stream: tradingWindowIndexService.stream$,
+      initialData: 0,
+      builder:
+          (BuildContext context, AsyncSnapshot tradingWindowIndexSnapshot) {
+        return charts.TimeSeriesChart(
+          _createChartData(stocks.sublist(0,
+              AppConstants.TRADING_WINDOWS[tradingWindowIndexSnapshot.data])),
+          animate: animate,
+          dateTimeFactory: const charts.LocalDateTimeFactory(),
+        );
+      },
     );
   }
 
@@ -94,8 +104,7 @@ class SimpleTimeSeriesChart extends StatelessWidget {
           colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
           domainFn: (Stock stock, _) => stock.date,
           measureFn: (Stock stock, _) => stock.close,
-          data: stocks,
-          measureLowerBoundFn: (Stock stock, _) => 40)
+          data: stocks)
     ];
   }
 }

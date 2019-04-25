@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:stock_analysis_application_ui/src/widgets/company_row_widget.dart';
 import 'package:stock_analysis_application_ui/src/models/company.dart';
+import 'package:stock_analysis_application_ui/src/screens/company/widgets/company_list_view.dart';
+import 'package:stock_analysis_application_ui/src/screens/company/widgets/company_search_field.dart';
+import 'package:stock_analysis_application_ui/src/screens/company/widgets/company_screen_app_bar.dart';
 
 class CompanyScreen extends StatefulWidget {
   final List<Company> companies;
@@ -28,9 +30,7 @@ class CompanyScreenState extends State<CompanyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("STOCK ANALYSIS APPLICATION"),
-        ),
+        appBar: CompanyScreenAppBar(),
         body: Container(
           child: Column(
             children: <Widget>[
@@ -51,48 +51,5 @@ class CompanyScreenState extends State<CompanyScreen> {
             ],
           ),
         ));
-  }
-}
-
-class CompanySearchField extends StatelessWidget {
-  final TextEditingController searchController;
-  const CompanySearchField({Key key, this.searchController}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: TextField(
-          controller: searchController,
-          decoration: InputDecoration(
-              labelText: "search for company",
-              hintText: "search by name (or) symbol",
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)))),
-        ),
-      ),
-    );
-  }
-}
-
-class CompanyListView extends StatelessWidget {
-  final List<Company> companies;
-  const CompanyListView({Key key, this.companies}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Flexible(
-        child: ListView.builder(
-          itemCount: companies.length,
-          itemBuilder: (BuildContext context, int index) => CompanyRowWidget(
-                company: companies[index],
-                index: index,
-              ),
-        ),
-      ),
-    );
   }
 }
