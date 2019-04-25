@@ -67,7 +67,7 @@ class CompanySearchField extends StatelessWidget {
           controller: searchController,
           decoration: InputDecoration(
               labelText: "search for company",
-              hintText: "search for company name (or) bse code",
+              hintText: "search by name (or) symbol",
               prefixIcon: Icon(Icons.search),
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)))),

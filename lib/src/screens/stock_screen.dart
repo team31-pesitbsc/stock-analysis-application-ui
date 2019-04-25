@@ -3,14 +3,13 @@ import 'package:stock_analysis_application_ui/src/models/company.dart';
 
 import 'package:stock_analysis_application_ui/src/models/stock.dart';
 import 'package:stock_analysis_application_ui/src/models/prediction.dart';
-
-import 'package:stock_analysis_application_ui/src/widgets/stock_row_widget.dart';
-import 'package:stock_analysis_application_ui/src/widgets/keep_alive_future_builder.dart';
 import 'package:stock_analysis_application_ui/src/widgets/prediction_row_widget.dart';
 
 import 'package:stock_analysis_application_ui/src/providers/stock.service.dart';
 import 'package:stock_analysis_application_ui/src/providers/prediction.service.dart';
 import 'package:rxdart/rxdart.dart';
+
+import 'package:charts_flutter/flutter.dart' as charts;
 
 import 'package:stock_analysis_application_ui/src/common/constants/app_constants.dart';
 
@@ -26,14 +25,30 @@ class StockScreen extends StatelessWidget {
       ),
       body: Column(
         children: <Widget>[
+          FutureBuilder(
+            future:
+                getStocks(symbol: company.symbol, pageSize: 30, pageNumber: 0),
+            initialData: List<Stock>(),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<Stock>> snapshot) {
+              return SizedBox(
+                child: SimpleTimeSeriesChart(
+                  stocks: snapshot.data,
+                  animate: false,
+                ),
+                height: 450,
+                width: 400,
+              );
+            },
+          ),
           Padding(
-            padding: EdgeInsets.all(50),
+            padding: EdgeInsets.all(10),
           ),
           StockScreenPredictions(
             company: company,
           ),
           Padding(
-            padding: EdgeInsets.all(30),
+            padding: EdgeInsets.all(10),
           ),
           TradingWindowPicker(),
         ],
@@ -56,6 +71,35 @@ class StockScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
+class SimpleTimeSeriesChart extends StatelessWidget {
+  final List<Stock> stocks;
+  final bool animate;
+
+  SimpleTimeSeriesChart({@required this.stocks, this.animate});
+
+  @override
+  Widget build(BuildContext context) {
+    return new charts.TimeSeriesChart(
+      _createChartData(stocks),
+      animate: animate,
+      dateTimeFactory: const charts.LocalDateTimeFactory(),
+    );
+  }
+
+  static List<charts.Series<Stock, DateTime>> _createChartData(
+      List<Stock> stocks) {
+    return [
+      new charts.Series<Stock, DateTime>(
+          id: 'Stock',
+          colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
+          domainFn: (Stock stock, _) => stock.date,
+          measureFn: (Stock stock, _) => stock.close,
+          data: stocks,
+          measureLowerBoundFn: (Stock stock, _) => 40)
+    ];
+  }
+}
+
 class StockScreenPredictions extends StatelessWidget {
   final Company company;
   const StockScreenPredictions({Key key, this.company}) : super(key: key);
@@ -75,7 +119,7 @@ class StockScreenPredictions extends StatelessWidget {
             return StockScreenPredictionsList(
                 predictions: predictionsSnapshot.data
                     .where((x) =>
-                        x.classifier == "RF" &&
+                        x.classifier == "GBDT" &&
                         x.tradingWindow ==
                             AppConstants.TRADING_WINDOWS[
                                 tradingWindowIndexSnapshot.data])
@@ -131,153 +175,30 @@ class TradingWindowPickerState extends State<TradingWindowPicker> {
   int tradingWindowIndex = 0;
   @override
   Widget build(BuildContext context) {
-    return Slider(
-      label: AppConstants.TRADING_WINDOWS[tradingWindowIndex].toString(),
-      value: tradingWindowIndex.toDouble(),
-      onChanged: (value) {
-        setState(() {
-          tradingWindowIndex = value.toInt();
-          tradingWindowIndexService.setTradingWindowIndex(tradingWindowIndex);
-        });
-      },
-      min: 0,
-      max: AppConstants.TRADING_WINDOWS.length.toDouble() - 1,
-      divisions: AppConstants.TRADING_WINDOWS.length - 1,
+    return Column(
+      children: <Widget>[
+        Text(
+          "Trading Window : ${AppConstants.TRADING_WINDOWS[tradingWindowIndex].toString()}",
+          style: TextStyle(fontSize: 20),
+        ),
+        Padding(
+          padding: EdgeInsets.all(25),
+        ),
+        Slider(
+          label: AppConstants.TRADING_WINDOWS[tradingWindowIndex].toString(),
+          value: tradingWindowIndex.toDouble(),
+          onChanged: (value) {
+            setState(() {
+              tradingWindowIndex = value.toInt();
+              tradingWindowIndexService
+                  .setTradingWindowIndex(tradingWindowIndex);
+            });
+          },
+          min: 0,
+          max: AppConstants.TRADING_WINDOWS.length.toDouble() - 1,
+          divisions: AppConstants.TRADING_WINDOWS.length - 1,
+        ),
+      ],
     );
   }
 }
-
-// class StockScreen extends StatefulWidget {
-//   final Company company;
-
-//   StockScreen({Key key, this.company}) : super(key: key);
-//   @override
-//   _StockScreenState createState() => _StockScreenState();
-// }
-
-// class _StockScreenState extends State<StockScreen> {
-//   List<Prediction> predictions;
-//   String classifier = AppConstants.CLASSIFIERS[0];
-//   int tradingWindow = AppConstants.TRADING_WINDOWS[0];
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text("Stock Page"),
-//       ),
-//       body: Column(
-//         children: <Widget>[
-//           Column(
-//             children: <Widget>[
-//               Text(
-//                 widget.company.name,
-//                 style: TextStyle(fontSize: 25.0),
-//               ),
-//               Text(
-//                 widget.company.symbol,
-//                 style: TextStyle(fontSize: 15.0),
-//               )
-//             ],
-//           ),
-//           Container(
-//               margin: EdgeInsets.symmetric(vertical: 5.0),
-//               height: MediaQuery.of(context).size.height * 0.53,
-//               child: ListView.builder(
-//                   reverse: true,
-//                   itemBuilder: (context, pageNumber) {
-//                     return KeepAliveFutureBuilder(
-//                       future: getStocks(
-//                           symbol: widget.company.symbol,
-//                           pageSize: AppConstants.pageSize,
-//                           pageNumber: pageNumber),
-//                       builder: (context, snapshot) {
-//                         switch (snapshot.connectionState) {
-//                           case ConnectionState.none:
-//                           case ConnectionState.waiting:
-//                             return SizedBox(
-//                                 height: MediaQuery.of(context).size.height * 2,
-//                                 child: Align(
-//                                     alignment: Alignment.topCenter,
-//                                     child: CircularProgressIndicator()));
-//                           case ConnectionState.active:
-//                             break;
-//                           case ConnectionState.done:
-//                             if (snapshot.hasError) {
-//                               return Text('Error: ${snapshot.error}');
-//                             } else {
-//                               return this._buildPage(snapshot.data);
-//                             }
-//                         }
-//                       },
-//                     );
-//                   })),
-//           Row(
-//             children: <Widget>[
-//               DropdownButton<String>(
-//                 hint: Text("CLASSIFIER"),
-//                 onChanged: (String newValue) {
-//                   setState(() {
-//                     classifier = newValue;
-//                   });
-//                 },
-//                 items: AppConstants.CLASSIFIERS
-//                     .map<DropdownMenuItem<String>>((String value) {
-//                   return DropdownMenuItem<String>(
-//                     value: value,
-//                     child: Text(value),
-//                   );
-//                 }).toList(),
-//               ),
-//               DropdownButton<int>(
-//                 hint: Text("TRADING_WINDOWS"),
-//                 onChanged: (int newValue) {
-//                   setState(() {
-//                     tradingWindow = newValue;
-//                   });
-//                 },
-//                 items: AppConstants.TRADING_WINDOWS
-//                     .map<DropdownMenuItem<int>>((int value) {
-//                   return DropdownMenuItem<int>(
-//                     value: value,
-//                     child: Text(value.toString()),
-//                   );
-//                 }).toList(),
-//               ),
-//             ],
-//           ),
-//           Container(
-//               margin: EdgeInsets.symmetric(vertical: 10.0),
-//               height: MediaQuery.of(context).size.height * 0.15,
-//               child: FutureBuilder(
-//                 future: getPredictions(widget.company.symbol),
-//                 builder: (BuildContext context,
-//                     AsyncSnapshot<List<Prediction>> snapshot) {
-//                   switch (snapshot.connectionState) {
-//                     case ConnectionState.none:
-//                       return Text('Press button to start.');
-//                     case ConnectionState.active:
-//                     case ConnectionState.waiting:
-//                       return Text('Awaiting result...');
-//                     case ConnectionState.done:
-//                       if (snapshot.hasError)
-//                         return Text('Error: ${snapshot.error}');
-//
-//                   }
-//                 },
-//               )),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildPage(List<Stock> page) {
-//     return ListView(
-//         reverse: true,
-//         shrinkWrap: true,
-//         primary: false,
-//         children: page.map((Stock stock) {
-//           return StockRowWidget(stock);
-//         }).toList());
-//   }
-// }
