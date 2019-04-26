@@ -7,11 +7,12 @@ import 'package:stock_analysis_application_ui/src/widgets/prediction_row_widget.
 
 import 'package:stock_analysis_application_ui/src/providers/stock.service.dart';
 import 'package:stock_analysis_application_ui/src/providers/prediction.service.dart';
-import 'package:rxdart/rxdart.dart';
 
 import 'package:charts_flutter/flutter.dart' as charts;
 
 import 'package:stock_analysis_application_ui/src/common/constants/app_constants.dart';
+
+final tradingWindowIndexValueNotifier = ValueNotifier(0);
 
 class StockScreen extends StatelessWidget {
   final Company company;
@@ -33,14 +34,22 @@ class StockScreen extends StatelessWidget {
             initialData: List<Stock>(),
             builder:
                 (BuildContext context, AsyncSnapshot<List<Stock>> snapshot) {
-              return SizedBox(
-                child: SimpleTimeSeriesChart(
-                  stocks: snapshot.data,
-                  animate: false,
-                ),
-                height: 450,
-                width: 400,
-              );
+              switch (snapshot.connectionState) {
+                case ConnectionState.active:
+                case ConnectionState.done:
+                  return SizedBox(
+                    child: SimpleTimeSeriesChart(
+                      stocks: snapshot.data,
+                      animate: false,
+                    ),
+                    height: 450,
+                    width: 400,
+                  );
+                case ConnectionState.waiting:
+                  return CircularProgressIndicator();
+                case ConnectionState.none:
+                  return Text("what to do here?");
+              }
             },
           ),
           Padding(
@@ -81,14 +90,12 @@ class SimpleTimeSeriesChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new StreamBuilder(
-      stream: tradingWindowIndexService.stream$,
-      initialData: 0,
-      builder:
-          (BuildContext context, AsyncSnapshot tradingWindowIndexSnapshot) {
+    return ValueListenableBuilder(
+      valueListenable: tradingWindowIndexValueNotifier,
+      builder: (BuildContext context, tradingWindowIndex, _) {
         return charts.TimeSeriesChart(
-          _createChartData(stocks.sublist(0,
-              AppConstants.TRADING_WINDOWS[tradingWindowIndexSnapshot.data])),
+          _createChartData(stocks.sublist(
+              0, AppConstants.TRADING_WINDOWS[tradingWindowIndex])),
           animate: animate,
           dateTimeFactory: const charts.LocalDateTimeFactory(),
         );
@@ -99,7 +106,7 @@ class SimpleTimeSeriesChart extends StatelessWidget {
   static List<charts.Series<Stock, DateTime>> _createChartData(
       List<Stock> stocks) {
     return [
-      new charts.Series<Stock, DateTime>(
+      charts.Series<Stock, DateTime>(
           id: 'Stock',
           colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
           domainFn: (Stock stock, _) => stock.date,
@@ -118,23 +125,29 @@ class StockScreenPredictions extends StatelessWidget {
     return FutureBuilder(
       future: getPredictions(company.symbol),
       initialData: List<Prediction>(),
-      builder: (BuildContext context,
-          AsyncSnapshot<List<Prediction>> predictionsSnapshot) {
-        return StreamBuilder(
-          stream: tradingWindowIndexService.stream$,
-          initialData: 0,
-          builder:
-              (BuildContext context, AsyncSnapshot tradingWindowIndexSnapshot) {
-            return StockScreenPredictionsList(
-                predictions: predictionsSnapshot.data
-                    .where((x) =>
-                        x.classifier == "GBDT" &&
-                        x.tradingWindow ==
-                            AppConstants.TRADING_WINDOWS[
-                                tradingWindowIndexSnapshot.data])
-                    .toList());
-          },
-        );
+      builder:
+          (BuildContext context, AsyncSnapshot<List<Prediction>> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.active:
+          case ConnectionState.done:
+            return ValueListenableBuilder(
+              valueListenable: tradingWindowIndexValueNotifier,
+              builder: (BuildContext context, tradingWindowIndex, _) {
+                return StockScreenPredictionsList(
+                    predictions: snapshot.data
+                        .where((x) =>
+                            x.classifier == "GBDT" &&
+                            x.tradingWindow ==
+                                AppConstants
+                                    .TRADING_WINDOWS[tradingWindowIndex])
+                        .toList());
+              },
+            );
+          case ConnectionState.waiting:
+            return CircularProgressIndicator();
+          case ConnectionState.none:
+            return Text("what to do here?");
+        }
       },
     );
   }
@@ -163,17 +176,6 @@ class StockScreenPredictionsList extends StatelessWidget {
   }
 }
 
-class TradingWindowIndex {
-  BehaviorSubject _tradingWindowIndex = BehaviorSubject.seeded(0);
-  Observable get stream$ => _tradingWindowIndex.stream;
-  int get current => _tradingWindowIndex.value;
-  setTradingWindowIndex(int newTradingWindowIndex) {
-    _tradingWindowIndex.add(newTradingWindowIndex);
-  }
-}
-
-TradingWindowIndex tradingWindowIndexService = TradingWindowIndex();
-
 class TradingWindowPicker extends StatefulWidget {
   TradingWindowPicker({Key key}) : super(key: key);
 
@@ -181,7 +183,7 @@ class TradingWindowPicker extends StatefulWidget {
 }
 
 class TradingWindowPickerState extends State<TradingWindowPicker> {
-  int tradingWindowIndex = 0;
+  int tradingWindowIndex = tradingWindowIndexValueNotifier.value;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -199,8 +201,7 @@ class TradingWindowPickerState extends State<TradingWindowPicker> {
           onChanged: (value) {
             setState(() {
               tradingWindowIndex = value.toInt();
-              tradingWindowIndexService
-                  .setTradingWindowIndex(tradingWindowIndex);
+              tradingWindowIndexValueNotifier.value = tradingWindowIndex;
             });
           },
           min: 0,
