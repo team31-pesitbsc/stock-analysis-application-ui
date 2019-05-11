@@ -1,5 +1,3 @@
-# Stock Analysis Application (UI)
-
 <p align="center">
 <img src= "assets/images/feature-graphic.png" height = 300>
 </p>
