@@ -21,50 +21,51 @@ class StockScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: StockScreenAppBar(
-        company: company,
-      ),
-      body: Column(
-        children: <Widget>[
-          FutureBuilder(
-            future: getStocks(
-                symbol: company.symbol,
-                pageSize: AppConstants.pageSize,
-                pageNumber: 0),
-            initialData: List<Stock>(),
-            builder:
-                (BuildContext context, AsyncSnapshot<List<Stock>> snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.active:
-                case ConnectionState.done:
-                  return SizedBox(
-                    child: SimpleTimeSeriesChart(
-                      stocks: snapshot.data,
-                      animate: false,
-                    ),
-                    height: 450,
-                    width: 400,
-                  );
-                case ConnectionState.waiting:
-                  return CircularProgressIndicator();
-                case ConnectionState.none:
-                  return Text("what to do here?");
-              }
-            },
+        appBar: StockScreenAppBar(
+          company: company,
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              FutureBuilder(
+                future: getStocks(
+                    symbol: company.symbol,
+                    pageSize: AppConstants.pageSize,
+                    pageNumber: 0),
+                initialData: List<Stock>(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<Stock>> snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.active:
+                    case ConnectionState.done:
+                      return SizedBox(
+                        child: SimpleTimeSeriesChart(
+                          stocks: snapshot.data,
+                          animate: false,
+                        ),
+                        height: 450,
+                        width: 400,
+                      );
+                    case ConnectionState.waiting:
+                      return CircularProgressIndicator();
+                    case ConnectionState.none:
+                      return Text("what to do here?");
+                  }
+                },
+              ),
+              Padding(
+                padding: EdgeInsets.all(10),
+              ),
+              StockScreenPredictions(
+                company: company,
+              ),
+              Padding(
+                padding: EdgeInsets.all(10),
+              ),
+              TradingWindowPicker(),
+            ],
           ),
-          Padding(
-            padding: EdgeInsets.all(10),
-          ),
-          StockScreenPredictions(
-            company: company,
-          ),
-          Padding(
-            padding: EdgeInsets.all(10),
-          ),
-          TradingWindowPicker(),
-        ],
-      ),
-    );
+        ));
   }
 }
 
