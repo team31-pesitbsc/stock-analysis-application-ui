@@ -147,7 +147,7 @@ class StockScreenPredictions extends StatelessWidget {
           case ConnectionState.waiting:
             return CircularProgressIndicator();
           case ConnectionState.none:
-            return Text("what to do here?");
+            return Text("TODO - what to do here?");
         }
       },
     );
