@@ -15,7 +15,7 @@ view predictions of directions of stock market prices for various companies.
 <center><img src= "assets/images/demo.gif" height = 300></center>
 <br/><br/>
 The Stock Analysis Application provides an accurate indication on whether the price
-of stock will rise or fall. It has features such as real time data updates, predictions which
+of stock will rise or fall. It has features such as real   time data updates, predictions which
 are evaluated daily and a list of many companies to choose from. The application is
 intended to be user friendly and can be operated easily.
 
